@@ -1,0 +1,434 @@
+
+<script>
+(function () {
+  'use strict';
+
+  var doc = document.documentElement;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var mock = document.getElementById('mock');
+
+  /* ---------- 01 theme (dark first, light optional) ---------- */
+  var tgl = document.getElementById('theme');
+  var meta = document.querySelector('meta[name="theme-color"]');
+  var theme = 'dark';
+  try { var saved = localStorage.getItem('af-theme'); if (saved === 'light' || saved === 'dark') theme = saved; } catch (e) {}
+
+  function applyTheme(t) {
+    doc.setAttribute('data-theme', t);
+    tgl.setAttribute('aria-checked', t === 'dark' ? 'true' : 'false');
+    if (meta) meta.setAttribute('content', t === 'dark' ? '#0A0B1A' : '#EDEFF9');
+  }
+  applyTheme(theme);
+  tgl.addEventListener('click', function () {
+    theme = doc.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(theme);
+    try { localStorage.setItem('af-theme', theme); } catch (e) {}
+  });
+
+  /* ---------- 02 scroll: progress bar, nav state, mockup parallax ---------- */
+  var nav = document.getElementById('nav');
+  var prog = document.getElementById('progress');
+  var queued = false;
+
+  function paint() {
+    queued = false;
+    var y = window.pageYOffset || doc.scrollTop || 0;
+    nav.classList.toggle('scrolled', y > 12);
+    var span = doc.scrollHeight - window.innerHeight;
+    prog.style.transform = 'scaleX(' + (span > 0 ? Math.min(1, Math.max(0, y / span)) : 0) + ')';
+    if (totop) totop.classList.toggle('show', y > window.innerHeight * 0.9);
+
+    if (mock && !reduce.matches) {
+      var r = mock.getBoundingClientRect();
+      var p = (window.innerHeight / 2 - (r.top + r.height / 2)) / window.innerHeight;
+      p = Math.max(-1, Math.min(1, p));
+      mock.style.transform =
+        'translate3d(-2.6%,' + (p * -18).toFixed(2) + 'px,0) rotateX(' + (15 - p * 7).toFixed(2) +
+        'deg) rotateY(' + (-11 + p * 5).toFixed(2) + 'deg) rotateZ(1.4deg) scale(.97)';
+    }
+  }
+  function onScroll() { if (!queued) { queued = true; window.requestAnimationFrame(paint); } }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---------- 03 entrance reveals (IntersectionObserver only) ---------- */
+  var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  if (!('IntersectionObserver' in window) || reduce.matches) {
+    reveals.forEach(function (el) { el.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.1 });
+    reveals.forEach(function (el) { io.observe(el); });
+    // safety net: never leave a section invisible if the observer stays silent
+    window.setTimeout(function () {
+      reveals.forEach(function (el) { el.classList.add('in'); });
+    }, 2600);
+  }
+
+  /* ---------- 04 pointer spotlight on capability cards ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.feat'), function (card) {
+    card.addEventListener('pointermove', function (e) {
+      var r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(2) + '%');
+      card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(2) + '%');
+    });
+  });
+
+  /* ---------- 05 testimonial carousel ---------- */
+  var car = document.querySelector('[data-carousel]');
+  var carApi = null;
+  if (car) {
+    var vp = car.querySelector('[data-vp]');
+    var track = car.querySelector('[data-track]');
+    var slides = Array.prototype.slice.call(track.children);
+    var dotBox = document.querySelector('[data-dots]');
+    var total = slides.length;
+    var idx = 0, dx = 0, dragging = false, startX = 0, pointer = null, timer = null;
+
+    slides.forEach(function (s, k) {
+      var d = document.createElement('button');
+      d.type = 'button';
+      d.className = 'dot';
+      d.setAttribute('role', 'tab');
+      d.setAttribute('aria-label', '案例 ' + (k + 1) + ' / ' + total);
+      d.addEventListener('click', function () { go(k, true); });
+      dotBox.appendChild(d);
+    });
+    var dots = Array.prototype.slice.call(dotBox.children);
+
+    function step() { return slides[0].getBoundingClientRect().width || 1; }
+
+    function render(offset) {
+      track.style.transform = 'translate3d(' + (-idx * step() + (offset || 0)).toFixed(2) + 'px,0,0)';
+    }
+    function sync() {
+      dots.forEach(function (d, k) { d.setAttribute('aria-current', k === idx ? 'true' : 'false'); });
+      slides.forEach(function (s, k) { s.setAttribute('aria-hidden', k === idx ? 'false' : 'true'); });
+    }
+    function go(next, fromUser) {
+      idx = (next % total + total) % total;
+      track.style.transition = '';
+      render(0);
+      sync();
+      if (fromUser) restart();
+    }
+    function start() {
+      if (reduce.matches) return;
+      stop();
+      timer = window.setInterval(function () { go(idx + 1, false); }, 6000);
+    }
+    function stop() { if (timer) { window.clearInterval(timer); timer = null; } }
+    function restart() { stop(); start(); }
+
+    carApi = { go: go, start: start, stop: stop };
+
+    car.querySelector('[data-prev]').addEventListener('click', function () { go(idx - 1, true); });
+    car.querySelector('[data-next]').addEventListener('click', function () { go(idx + 1, true); });
+
+    vp.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(idx - 1, true); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(idx + 1, true); }
+    });
+
+    vp.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      dragging = true; startX = e.clientX; dx = 0;
+      track.style.transition = 'none';
+      try { vp.setPointerCapture(e.pointerId); pointer = e.pointerId; } catch (err) {}
+      stop();
+    });
+    vp.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      dx = e.clientX - startX;
+      render(dx);
+    });
+    function release() {
+      if (!dragging) return;
+      dragging = false;
+      if (pointer !== null) { try { vp.releasePointerCapture(pointer); } catch (err) {} pointer = null; }
+      var threshold = step() * 0.18;
+      if (dx <= -threshold) idx = Math.min(total - 1, idx + 1);
+      else if (dx >= threshold) idx = Math.max(0, idx - 1);
+      dx = 0;
+      track.style.transition = '';
+      void track.offsetWidth;
+      render(0);
+      sync();
+      start();
+    }
+    vp.addEventListener('pointerup', release);
+    vp.addEventListener('pointercancel', release);
+    vp.addEventListener('pointerleave', function () { if (dragging) release(); });
+
+    car.addEventListener('pointerenter', stop);
+    car.addEventListener('pointerleave', start);
+    car.addEventListener('focusin', stop);
+    car.addEventListener('focusout', function (e) { if (!car.contains(e.relatedTarget)) start(); });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop(); else start();
+    });
+
+    sync();
+    render(0);
+    start();
+    window.addEventListener('resize', function () { track.style.transition = 'none'; render(0); void track.offsetWidth; track.style.transition = ''; }, { passive: true });
+  }
+
+  /* ---------- 06 FAQ accordion (one open at a time) ---------- */
+  var qas = Array.prototype.slice.call(document.querySelectorAll('[data-qa]'));
+  qas.forEach(function (qa) {
+    var btn = qa.querySelector('.qa__q');
+    btn.addEventListener('click', function () {
+      var wasOpen = qa.getAttribute('data-open') === 'true';
+      qas.forEach(function (o) {
+        o.setAttribute('data-open', 'false');
+        o.querySelector('.qa__q').setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) {
+        qa.setAttribute('data-open', 'true');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  /* ---------- 07 subscribe form: validate, load, toast ---------- */
+  var form = document.getElementById('subForm');
+  var input = document.getElementById('email');
+  var msg = document.getElementById('subMsg');
+  var toast = document.getElementById('toast');
+  var toastText = document.getElementById('toastText');
+  var subBtn = document.getElementById('subBtn');
+  var idle = msg ? msg.textContent : '';
+  var mail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  var hideToast;
+
+  function say(text, bad) { msg.textContent = text; msg.classList.toggle('err', !!bad); }
+  function esc(s) { return s.replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fire(html) {
+    toastText.innerHTML = html;
+    toast.classList.add('show');
+    window.clearTimeout(hideToast);
+    hideToast = window.setTimeout(function () { toast.classList.remove('show'); }, 5600);
+  }
+
+  if (form) form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (form.classList.contains('loading')) return;
+    var v = (input.value || '').trim();
+    if (!mail.test(v)) {
+      say('邮箱格式看起来不对，试试 name@example.com', true);
+      input.focus();
+      return;
+    }
+    say('正在发送', false);
+    form.classList.add('loading');
+    subBtn.disabled = true;
+    window.setTimeout(function () {
+      form.classList.remove('loading');
+      subBtn.disabled = false;
+      input.value = '';
+      say(idle, false);
+      fire('订阅成功，确认邮件已发到 <b>' + esc(v) + '</b>。');
+    }, 1300);
+  });
+
+  /* ---------- 08 mobile menu ---------- */
+  var navToggle = document.getElementById('navToggle');
+  var navPanel = document.getElementById('navPanel');
+  function closeMenu() { if (!navPanel) return; navPanel.classList.remove('open'); navToggle.setAttribute('aria-expanded', 'false'); }
+  if (navToggle && navPanel) {
+    navToggle.addEventListener('click', function () {
+      var open = navPanel.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    navPanel.addEventListener('click', function (e) { if (e.target.tagName === 'A') closeMenu(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !(pal && pal.classList.contains('open'))) closeMenu();
+  });
+
+  /* ---------- 09 站内搜索 / 跳转高亮 / 回到顶部 ---------- */
+  var pal = document.getElementById('pal');
+  var palInput = document.getElementById('palInput');
+  var palList = document.getElementById('palList');
+  var palEmpty = document.getElementById('palEmpty');
+  var totop = document.getElementById('totop');
+  var index = [], rows = [], rowEntries = [], active = 0, lastFocus = null;
+
+  function addEntry(kind, cls, title, text, node, caseIdx) {
+    index.push({ kind: kind, cls: cls, title: title, text: text, node: node, caseIdx: caseIdx,
+                 hay: (title + ' ' + text).toLowerCase() });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.feat'), function (card) {
+    addEntry('技能', '', card.querySelector('h3').textContent.trim(),
+             card.querySelector('p').textContent.trim(), card);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.car__track .slide'), function (slide, i) {
+    var tags = Array.prototype.map.call(slide.querySelectorAll('.tag'), function (t) { return t.textContent.trim(); });
+    addEntry('案例', 'pal__kind--case', slide.querySelector('.qcard__title').textContent.trim(),
+             slide.querySelector('.qcard p').textContent.trim() + ' ' + tags.join(' '),
+             slide.querySelector('.qcard'), i);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-qa]'), function (qa) {
+    addEntry('问答', 'pal__kind--faq', qa.querySelector('.qa__q span').textContent.trim(),
+             qa.querySelector('.qa__inner p').textContent.trim(), qa);
+  });
+  [['技能库', '#skills'], ['工作流案例', '#cases'], ['问答', '#faq'], ['订阅更新', '#contact']]
+    .forEach(function (s) { addEntry('区块', 'pal__kind--sec', s[0], '跳转到该区块', document.querySelector(s[1])); });
+
+  function scoreOf(e, terms) {
+    var s = 0, title = e.title.toLowerCase();
+    for (var i = 0; i < terms.length; i++) {
+      if (title.indexOf(terms[i]) === 0) s += 4;
+      else if (title.indexOf(terms[i]) >= 0) s += 3;
+      else if (e.hay.indexOf(terms[i]) >= 0) s += 1;
+      else return -1;
+    }
+    return s;
+  }
+
+  function render(q) {
+    var terms = q.toLowerCase().split(/\s+/).filter(function (t) { return t.length > 0; });
+    var hits = index
+      .map(function (e) { return { e: e, s: scoreOf(e, terms) }; })
+      .filter(function (h) { return terms.length === 0 || h.s > 0; });
+    if (terms.length) hits.sort(function (a, b) { return b.s - a.s; });
+
+    palList.innerHTML = '';
+    rows = [];
+    rowEntries = [];
+    active = 0;
+    hits.forEach(function (h, i) {
+      var e = h.e;
+      var text = e.text.length > 48 ? e.text.slice(0, 48) + '...' : e.text;
+      var li = document.createElement('li');
+      li.className = 'pal__item';
+      li.id = 'pal-opt-' + i;
+      li.setAttribute('role', 'option');
+      li.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+      li.innerHTML = '<span class="pal__kind ' + e.cls + '">' + e.kind + '</span>' +
+                     '<span class="pal__text"><b>' + esc(e.title) + '</b><em>' + esc(text) + '</em></span>';
+      li.addEventListener('click', function () { jump(e); });
+      palList.appendChild(li);
+      rows.push(li);
+      rowEntries.push(e);
+    });
+    palEmpty.hidden = hits.length > 0;
+    palInput.setAttribute('aria-activedescendant', hits.length ? 'pal-opt-0' : '');
+  }
+
+  function activate(i) {
+    if (!rows.length) return;
+    active = (i % rows.length + rows.length) % rows.length;
+    rows.forEach(function (r, k) { r.setAttribute('aria-selected', k === active ? 'true' : 'false'); });
+    palInput.setAttribute('aria-activedescendant', rows[active].id);
+    rows[active].scrollIntoView({ block: 'nearest' });
+  }
+
+  function openPal(q) {
+    lastFocus = document.activeElement;
+    pal.classList.add('open');
+    palInput.value = q || '';
+    render(palInput.value);
+    window.setTimeout(function () { palInput.focus(); palInput.select(); }, 30);
+  }
+  function closePal() {
+    pal.classList.remove('open');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  /* 自己算纵向偏移，不用 scrollIntoView：轮播是 overflow:hidden 的横向滚动容器，
+     用 scrollIntoView 会顺带把它的 scrollLeft 改掉、打乱 transform 定位 */
+  function scrollToNode(node) {
+    if (!node) return;
+    var y = window.pageYOffset + node.getBoundingClientRect().top - 104;
+    window.scrollTo({ top: Math.max(0, y), behavior: reduce.matches ? 'auto' : 'smooth' });
+  }
+  function ring(node) {
+    if (!node) return;
+    node.classList.remove('hit');
+    void node.offsetWidth;
+    node.classList.add('hit');
+    window.setTimeout(function () { node.classList.remove('hit'); }, 1800);
+  }
+  function jump(e) {
+    closePal();
+    if (e.kind === '问答') {
+      qas.forEach(function (o) {
+        o.setAttribute('data-open', 'false');
+        o.querySelector('.qa__q').setAttribute('aria-expanded', 'false');
+      });
+      e.node.setAttribute('data-open', 'true');
+      e.node.querySelector('.qa__q').setAttribute('aria-expanded', 'true');
+    }
+    if (e.kind === '案例' && typeof e.caseIdx === 'number' && carApi) carApi.go(e.caseIdx, true);
+    scrollToNode(e.node);
+    window.setTimeout(function () { ring(e.node); }, 40);
+  }
+
+  /* 详情页没有搜索面板，这一整块跳过 */
+  if (pal) {
+    document.getElementById('searchBtn').addEventListener('click', function () { openPal(''); });
+    pal.addEventListener('mousedown', function (ev) { if (ev.target === pal) closePal(); });
+    palInput.addEventListener('input', function () { render(palInput.value); });
+    pal.addEventListener('keydown', function (ev) {
+      if (ev.key === 'ArrowDown') { ev.preventDefault(); activate(active + 1); }
+      else if (ev.key === 'ArrowUp') { ev.preventDefault(); activate(active - 1); }
+      else if (ev.key === 'Enter') { ev.preventDefault(); if (rowEntries[active]) jump(rowEntries[active]); }
+      else if (ev.key === 'Escape') { ev.preventDefault(); closePal(); }
+    });
+    document.addEventListener('keydown', function (ev) {
+      var t = ev.target, tag = (t.tagName || '').toLowerCase();
+      var typing = tag === 'input' || tag === 'textarea' || t.isContentEditable;
+      if ((ev.ctrlKey || ev.metaKey) && (ev.key === 'k' || ev.key === 'K')) { ev.preventDefault(); openPal(''); }
+      else if (ev.key === '/' && !typing && !pal.classList.contains('open')) { ev.preventDefault(); openPal(''); }
+    });
+
+    /* 点案例卡的标签 -> 用该标签发起搜索 */
+    document.addEventListener('click', function (ev) {
+      var tag = ev.target && ev.target.closest ? ev.target.closest('.tag') : null;
+      if (tag) { ev.preventDefault(); openPal(tag.getAttribute('data-tag') || tag.textContent.trim()); }
+    });
+  }
+
+  /* 点技能卡的「看 xxx」-> 切到对应案例并高亮 */
+  Array.prototype.forEach.call(document.querySelectorAll('.feat__link[data-case]'), function (a) {
+    a.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      var n = parseInt(a.getAttribute('data-case'), 10) - 1;
+      var slide = document.querySelectorAll('.car__track .slide')[n];
+      if (!slide) { scrollToNode(document.getElementById('cases')); return; }
+      if (carApi) carApi.go(n, true);
+      scrollToNode(slide);
+      window.setTimeout(function () { ring(slide.querySelector('.qcard')); }, 40);
+    });
+  });
+
+  if (totop) {
+    totop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: reduce.matches ? 'auto' : 'smooth' });
+    });
+  }
+
+  /* ---------- 10 boot ---------- */
+  if (reduce.addEventListener) {
+    reduce.addEventListener('change', function () {
+      if (reduce.matches) {
+        if (carApi) { carApi.stop(); carApi.go(0, false); }
+        if (mock) mock.style.transform = '';
+        paint();
+      } else if (carApi) {
+        carApi.start();
+      }
+    });
+  }
+
+  paint();
+})();
+</script>
+</body>
+</html>

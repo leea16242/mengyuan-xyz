@@ -1,0 +1,177 @@
+
+<!-- ==================== FAQ ==================== -->
+<section class="sec wrap" id="faq" aria-labelledby="faqTitle">
+  <div class="sec__head reveal" style="margin-inline:auto;text-align:center">
+    <p class="eyebrow">Questions</p>
+    <h2 id="faqTitle">The things you would ask on the call.</h2>
+    <p class="lead" style="margin-inline:auto">Short answers, no hedging. If something is still unclear, the beta Slack is one click away.</p>
+  </div>
+
+  <div class="faq">
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:0ms">
+      <h3><button class="qa__q" id="q1b" type="button" aria-expanded="false" aria-controls="q1p">
+        <span>When does AetherFlow leave beta?</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q1p" role="region" aria-labelledby="q1b"><div class="qa__inner">
+        <p>Public GA is scheduled for Q4 2026. Beta access stays free for the full duration, with no surprise pricing changes. You get at least 60 days notice before any billing starts.</p>
+      </div></div>
+    </div>
+
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:60ms">
+      <h3><button class="qa__q" id="q2b" type="button" aria-expanded="false" aria-controls="q2p">
+        <span>What does it cost?</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q2p" role="region" aria-labelledby="q2b"><div class="qa__inner">
+        <p>Free for individuals and small teams during beta. Paid tiers will be usage based and announced at least 60 days before billing starts. No card required to start.</p>
+      </div></div>
+    </div>
+
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:120ms">
+      <h3><button class="qa__q" id="q3b" type="button" aria-expanded="false" aria-controls="q3p">
+        <span>Can we self host, or keep data in our own cloud?</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q3p" role="region" aria-labelledby="q3b"><div class="qa__inner">
+        <p>Yes. Enterprise workspaces run the deploy plane and the inference plane inside your own VPC. Your repositories, artifacts and prompts never leave your network, and the control plane only sees signed metadata.</p>
+      </div></div>
+    </div>
+
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:180ms">
+      <h3><button class="qa__q" id="q4b" type="button" aria-expanded="false" aria-controls="q4p">
+        <span>How does it work with the tools we already use?</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q4p" role="region" aria-labelledby="q4b"><div class="qa__inner">
+        <p>Linear, GitHub, Figma, Slack and Stripe are wired in natively with two way sync. Anything else connects through the open plugin API, which is roughly forty lines of TypeScript for a basic integration.</p>
+      </div></div>
+    </div>
+
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:240ms">
+      <h3><button class="qa__q" id="q5b" type="button" aria-expanded="false" aria-controls="q5p">
+        <span>What happens to our work if we stop paying?</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q5p" role="region" aria-labelledby="q5b"><div class="qa__inner">
+        <p>Everything stays exportable. Projects, token sets, component libraries and full timeline history move to a read only workspace you can export at any time in open formats. Nothing is held hostage.</p>
+      </div></div>
+    </div>
+
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:300ms">
+      <h3><button class="qa__q" id="q6b" type="button" aria-expanded="false" aria-controls="q6p">
+        <span>Do you train models on our code?</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q6p" role="region" aria-labelledby="q6b"><div class="qa__inner">
+        <p>Never. Your code, prompts, artifacts and telemetry are excluded from training by contract at every tier, including the free beta. The agreement is public and can be reviewed before you sign up.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SUBSCRIBE ==================== -->
+<section class="sec sec--tight wrap" id="subscribe" aria-labelledby="subTitle">
+  <div class="sub glass reveal">
+    <span class="sub__halo" aria-hidden="true"></span>
+    <p class="eyebrow" style="justify-content:center">Launch notes</p>
+    <h2 id="subTitle">Get the notes when v0.9 ships.</h2>
+    <p class="lead">One email at launch, then the occasional deep dive on what we are building next. No noise, unsubscribe in one click.</p>
+    <form class="sub__form" id="subForm" novalidate>
+      <div class="sub__row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <label class="sr-only" for="email">Work email</label>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@company.com" required aria-describedby="subMsg">
+        <button class="btn btn--primary" type="submit" id="subBtn">
+          <span class="btn__label">Notify me
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </span>
+          <span class="btn__spin" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>
+          </span>
+        </button>
+      </div>
+      <p class="sub__msg" id="subMsg" role="status" aria-live="polite">Free during beta. No card, no spam, no sales sequence.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="foot wrap">
+  <div class="foot__top">
+    <div class="foot__brand">
+      <a class="brand" href="#top">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#markGrad)"/>
+          <path d="M16 7.6 24.4 16 16 24.4 7.6 16Z" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round" opacity=".92"/>
+          <path d="M16 12.2 19.8 16 16 19.8 12.2 16Z" fill="#fff" opacity=".95"/>
+        </svg>
+        AetherFlow
+      </a>
+      <p>The AI native product studio. One canvas from first sketch to production deploy.</p>
+    </div>
+    <div>
+      <h4>Product</h4>
+      <ul>
+        <li><a href="#capabilities">AI Canvas</a></li>
+        <li><a href="#capabilities">Instant Deploy</a></li>
+        <li><a href="#capabilities">Design Tokens</a></li>
+        <li><a href="#capabilities">Edge AI</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#stories">Customers</a></li>
+        <li><a href="#subscribe">Careers</a></li>
+        <li><a href="#subscribe">Blog</a></li>
+        <li><a href="#faq">Security</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="#faq">Docs</a></li>
+        <li><a href="#faq">API reference</a></li>
+        <li><a href="#faq">Status</a></li>
+        <li><a href="#subscribe">Community</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#faq">Privacy</a></li>
+        <li><a href="#faq">Terms</a></li>
+        <li><a href="#faq">DPA</a></li>
+        <li><a href="#faq">Subprocessors</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot__bot">
+    <p>&copy; 2026 AetherFlow Labs. All rights reserved.</p>
+    <div class="socials">
+      <a href="#top" aria-label="AetherFlow on GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49 0-.24-.01-.88-.01-1.73-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.4 9.4 0 0 1 2.5-.34c.85 0 1.71.12 2.5.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.48-.01 2.82 0 .27.18.59.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"/></svg>
+      </a>
+      <a href="#top" aria-label="AetherFlow on X">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-7.5 8.6L23 22h-6.9l-5.4-7-6.2 7H2l8-9.2L1.5 2h7l4.9 6.4L18.9 2Zm-1.2 18h1.9L7.4 3.8H5.4L17.7 20Z"/></svg>
+      </a>
+      <a href="#top" aria-label="AetherFlow on LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.55V9h3.57v11.45Z"/></svg>
+      </a>
+      <a href="#top" aria-label="AetherFlow on YouTube">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.58 7.19a2.5 2.5 0 0 0-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42A2.5 2.5 0 0 0 2.42 7.2C2 8.75 2 12 2 12s0 3.25.42 4.81a2.5 2.5 0 0 0 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42a2.5 2.5 0 0 0 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81ZM10 15.5v-7l6 3.5-6 3.5Z"/></svg>
+      </a>
+    </div>
+    <p style="font-family:var(--font-mono);font-size:12px;letter-spacing:.04em">BUILT FOR TEAMS THAT SHIP</p>
+  </div>
+</footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="toast__ic" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  </span>
+  <p id="toastText"></p>
+</div>

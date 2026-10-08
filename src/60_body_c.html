@@ -1,0 +1,199 @@
+
+<!-- ==================== FAQ ==================== -->
+<section class="sec wrap" id="faq" aria-labelledby="faqTitle">
+  <div class="sec__head reveal" style="margin-inline:auto;text-align:center">
+    <p class="eyebrow">问答</p>
+    <h2 id="faqTitle">几个常被问到的问题。</h2>
+    <p class="lead" style="margin-inline:auto">都是实际被问过的。答不上来的我会直说。</p>
+  </div>
+
+  <div class="faq">
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:0ms">
+      <h3><button class="qa__q" id="q1b" type="button" aria-expanded="false" aria-controls="q1p">
+        <span>为什么用 Agent，而不是写死脚本？</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q1p" role="region" aria-labelledby="q1b"><div class="qa__inner">
+        <p>写死脚本只能跑一条路径。图纸换一张、软件弹个对话框，它就断了。Agent 能自己绕过去，而每一步的回读校验还能复用。代价是得先把判据定义清楚，这活儿省不掉。</p>
+      </div></div>
+    </div>
+
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:60ms">
+      <h3><button class="qa__q" id="q2b" type="button" aria-expanded="false" aria-controls="q2p">
+        <span>这些技能换个零件还能用吗？</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q2p" role="region" aria-labelledby="q2b"><div class="qa__inner">
+        <p>能。技能里放的是流程和判据，零件参数是输入。换零件只要换图纸和尺寸表，流程不用重写。这也是把它做成 Skill 而不是一次性脚本的原因。</p>
+      </div></div>
+    </div>
+
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:120ms">
+      <h3><button class="qa__q" id="q3b" type="button" aria-expanded="false" aria-controls="q3p">
+        <span>跑之前需要什么环境？</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q3p" role="region" aria-labelledby="q3b"><div class="qa__inner">
+        <p>本机 Windows，装好对应软件并保持运行，Python 侧用 pywin32 和独立的虚拟环境。软件没启动的话 COM 连接会直接失败，这是最常见的原因。</p>
+      </div></div>
+    </div>
+
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:180ms">
+      <h3><button class="qa__q" id="q4b" type="button" aria-expanded="false" aria-controls="q4p">
+        <span>机械设计会被 AI 取代吗？</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q4p" role="region" aria-labelledby="q4b"><div class="qa__inner">
+        <p>画图和改图会，而且已经在发生。但定义需求、判断结构合不合理、公差给多少，这些还早。现在这套东西省掉的是点击和重复核对，不是判断。</p>
+      </div></div>
+    </div>
+
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:240ms">
+      <h3><button class="qa__q" id="q5b" type="button" aria-expanded="false" aria-controls="q5p">
+        <span>为什么每一步都要回读自检？</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q5p" role="region" aria-labelledby="q5b"><div class="qa__inner">
+        <p>因为本机多个 API 的返回值和实际结果是相反的。所以判据一律用面数、实体数、外观回读和渲染截图，不看返回值下结论。这条是被坑出来的。</p>
+      </div></div>
+    </div>
+
+    <div class="qa glass reveal" data-qa data-open="false" style="--d:300ms">
+      <h3><button class="qa__q" id="q6b" type="button" aria-expanded="false" aria-controls="q6p">
+        <span>可以合作，或者要脚本吗？</span>
+        <span class="qa__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button></h3>
+      <div class="qa__a" id="q6p" role="region" aria-labelledby="q6b"><div class="qa__inner">
+        <p>可以先聊具体要自动化的那个环节。能公开的脚本我会整理到站上，其余的按需单独说。</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SUBSCRIBE ==================== -->
+<section class="sec sec--tight wrap" id="contact" aria-labelledby="subTitle">
+  <div class="sub glass reveal">
+    <span class="sub__halo" aria-hidden="true"></span>
+    <p class="eyebrow" style="justify-content:center">更新</p>
+    <h2 id="subTitle">有新技能，就发一封邮件。</h2>
+    <p class="lead">不定期的进度信：刚跑通的技能、踩到的坑，以及跑不通的那些。不发广告，一封退订。</p>
+    <form class="sub__form" id="subForm" novalidate>
+      <div class="sub__row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <label class="sr-only" for="email">邮箱地址</label>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required aria-describedby="subMsg">
+        <button class="btn btn--primary" type="submit" id="subBtn">
+          <span class="btn__label">订阅
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </span>
+          <span class="btn__spin" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>
+          </span>
+        </button>
+      </div>
+      <p class="sub__msg" id="subMsg" role="status" aria-live="polite">只发进度，不发广告，随时退订。</p>
+    </form>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="foot wrap">
+  <div class="foot__top">
+    <div class="foot__brand">
+      <a class="brand" href="#top">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#markGrad)"/>
+          <path d="M16 6.6 24.1 11.3 24.1 20.7 16 25.4 7.9 20.7 7.9 11.3Z" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round" opacity=".95"/>
+          <circle cx="16" cy="16" r="3.4" fill="none" stroke="#fff" stroke-width="1.5" opacity=".95"/>
+        </svg>
+        MENGYUAN
+      </a>
+      <p>机械设计 × Agent 工作流。只记录能跑通的那部分自动化。</p>
+    </div>
+    <div>
+      <h4>技能</h4>
+      <ul>
+        <li><a href="#skills">SolidWorks 建模</a></li>
+        <li><a href="#skills">EPLAN 电气图</a></li>
+        <li><a href="#skills">CAXA 出图</a></li>
+        <li><a href="#skills">Photoshop 版式</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>案例</h4>
+      <ul>
+        <li><a href="case/pump/">齿轮油泵装配</a></li>
+        <li><a href="case/crown/">王冠瓶盖</a></li>
+        <li><a href="case/gear/">参数化齿轮</a></li>
+        <li><a href="case/funnel/">漏斗杯</a></li>
+        <li><a href="case/eplan/">正反转控制图</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>资源</h4>
+      <ul>
+        <li><a href="#skills">技能清单</a></li>
+        <li><a href="#faq">踩坑记录</a></li>
+        <li><a href="#skills">MCP 接入</a></li>
+        <li><a href="#faq">环境搭建</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>关于</h4>
+      <ul>
+        <li><a href="#top">关于我</a></li>
+        <li><a href="#skills">现在在做什么</a></li>
+        <li><a href="#contact">联系方式</a></li>
+        <li><a href="#contact">更新日志</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot__bot">
+    <p>&copy; 2026 MENGYUAN. All rights reserved.</p>
+    <div class="socials">
+      <!-- Cloudflare 的 Email Address Obfuscation 默认会把邮箱改成 /cdn-cgi/l/email-protection 与 [email protected]；用下面这对注释包住即可豁免 -->
+      <a href="https://github.com/leea16242" aria-label="GitHub 主页 leea16242">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49 0-.24-.01-.88-.01-1.73-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.4 9.4 0 0 1 2.5-.34c.85 0 1.71.12 2.5.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.48-.01 2.82 0 .27.18.59.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"/></svg>
+        <span class="mono">leea16242</span>
+      </a>
+      <!--email_off-->
+      <a href="mailto:leea16242@gmail.com" aria-label="发邮件到 leea16242@gmail.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <span class="mono">leea16242@gmail.com</span>
+      </a>
+      <!--/email_off-->
+    </div>
+    <p style="font-family:var(--font-mono);font-size:12px;letter-spacing:.04em">MECHANICAL DESIGN × AGENT WORKFLOW</p>
+  </div>
+</footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="toast__ic" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  </span>
+  <p id="toastText"></p>
+</div>
+
+<div class="pal" id="pal" role="dialog" aria-modal="true" aria-label="站内搜索">
+  <div class="pal__box">
+    <div class="pal__field">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <label class="sr-only" for="palInput">搜索技能、案例与问答</label>
+      <input id="palInput" type="text" placeholder="搜索技能、案例、问答" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="palList" aria-autocomplete="list">
+      <kbd>ESC</kbd>
+    </div>
+    <ul class="pal__list" id="palList" role="listbox" aria-label="搜索结果"></ul>
+    <p class="pal__empty" id="palEmpty" hidden>没找到匹配的内容，换个词试试</p>
+    <div class="pal__foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+      <span><kbd>Enter</kbd> 跳转</span>
+      <span><kbd>Esc</kbd> 关闭</span>
+    </div>
+  </div>
+</div>
+
+<button class="totop" id="totop" type="button" aria-label="回到顶部">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+</button>

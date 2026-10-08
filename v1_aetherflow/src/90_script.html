@@ -1,0 +1,265 @@
+
+<script>
+(function () {
+  'use strict';
+
+  var doc = document.documentElement;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var mock = document.getElementById('mock');
+
+  /* ---------- 01 theme (dark first, light optional) ---------- */
+  var tgl = document.getElementById('theme');
+  var meta = document.querySelector('meta[name="theme-color"]');
+  var theme = 'dark';
+  try { var saved = localStorage.getItem('af-theme'); if (saved === 'light' || saved === 'dark') theme = saved; } catch (e) {}
+
+  function applyTheme(t) {
+    doc.setAttribute('data-theme', t);
+    tgl.setAttribute('aria-checked', t === 'dark' ? 'true' : 'false');
+    if (meta) meta.setAttribute('content', t === 'dark' ? '#0A0B1A' : '#EDEFF9');
+  }
+  applyTheme(theme);
+  tgl.addEventListener('click', function () {
+    theme = doc.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(theme);
+    try { localStorage.setItem('af-theme', theme); } catch (e) {}
+  });
+
+  /* ---------- 02 scroll: progress bar, nav state, mockup parallax ---------- */
+  var nav = document.getElementById('nav');
+  var prog = document.getElementById('progress');
+  var queued = false;
+
+  function paint() {
+    queued = false;
+    var y = window.pageYOffset || doc.scrollTop || 0;
+    nav.classList.toggle('scrolled', y > 12);
+    var span = doc.scrollHeight - window.innerHeight;
+    prog.style.transform = 'scaleX(' + (span > 0 ? Math.min(1, Math.max(0, y / span)) : 0) + ')';
+
+    if (mock && !reduce.matches) {
+      var r = mock.getBoundingClientRect();
+      var p = (window.innerHeight / 2 - (r.top + r.height / 2)) / window.innerHeight;
+      p = Math.max(-1, Math.min(1, p));
+      mock.style.transform =
+        'translate3d(-2.6%,' + (p * -18).toFixed(2) + 'px,0) rotateX(' + (15 - p * 7).toFixed(2) +
+        'deg) rotateY(' + (-11 + p * 5).toFixed(2) + 'deg) rotateZ(1.4deg) scale(.97)';
+    }
+  }
+  function onScroll() { if (!queued) { queued = true; window.requestAnimationFrame(paint); } }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---------- 03 entrance reveals (IntersectionObserver only) ---------- */
+  var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  if (!('IntersectionObserver' in window) || reduce.matches) {
+    reveals.forEach(function (el) { el.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.1 });
+    reveals.forEach(function (el) { io.observe(el); });
+    // safety net: never leave a section invisible if the observer stays silent
+    window.setTimeout(function () {
+      reveals.forEach(function (el) { el.classList.add('in'); });
+    }, 2600);
+  }
+
+  /* ---------- 04 pointer spotlight on capability cards ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.feat'), function (card) {
+    card.addEventListener('pointermove', function (e) {
+      var r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(2) + '%');
+      card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(2) + '%');
+    });
+  });
+
+  /* ---------- 05 testimonial carousel ---------- */
+  var car = document.querySelector('[data-carousel]');
+  var carApi = null;
+  if (car) {
+    var vp = car.querySelector('[data-vp]');
+    var track = car.querySelector('[data-track]');
+    var slides = Array.prototype.slice.call(track.children);
+    var dotBox = document.querySelector('[data-dots]');
+    var total = slides.length;
+    var idx = 0, dx = 0, dragging = false, startX = 0, pointer = null, timer = null;
+
+    slides.forEach(function (s, k) {
+      var d = document.createElement('button');
+      d.type = 'button';
+      d.className = 'dot';
+      d.setAttribute('role', 'tab');
+      d.setAttribute('aria-label', 'Story ' + (k + 1) + ' of ' + total);
+      d.addEventListener('click', function () { go(k, true); });
+      dotBox.appendChild(d);
+    });
+    var dots = Array.prototype.slice.call(dotBox.children);
+
+    function step() { return slides[0].getBoundingClientRect().width || 1; }
+
+    function render(offset) {
+      track.style.transform = 'translate3d(' + (-idx * step() + (offset || 0)).toFixed(2) + 'px,0,0)';
+    }
+    function sync() {
+      dots.forEach(function (d, k) { d.setAttribute('aria-current', k === idx ? 'true' : 'false'); });
+      slides.forEach(function (s, k) { s.setAttribute('aria-hidden', k === idx ? 'false' : 'true'); });
+    }
+    function go(next, fromUser) {
+      idx = (next % total + total) % total;
+      track.style.transition = '';
+      render(0);
+      sync();
+      if (fromUser) restart();
+    }
+    function start() {
+      if (reduce.matches) return;
+      stop();
+      timer = window.setInterval(function () { go(idx + 1, false); }, 6000);
+    }
+    function stop() { if (timer) { window.clearInterval(timer); timer = null; } }
+    function restart() { stop(); start(); }
+
+    carApi = { go: go, start: start, stop: stop };
+
+    car.querySelector('[data-prev]').addEventListener('click', function () { go(idx - 1, true); });
+    car.querySelector('[data-next]').addEventListener('click', function () { go(idx + 1, true); });
+
+    vp.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(idx - 1, true); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(idx + 1, true); }
+    });
+
+    vp.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      dragging = true; startX = e.clientX; dx = 0;
+      track.style.transition = 'none';
+      try { vp.setPointerCapture(e.pointerId); pointer = e.pointerId; } catch (err) {}
+      stop();
+    });
+    vp.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      dx = e.clientX - startX;
+      render(dx);
+    });
+    function release() {
+      if (!dragging) return;
+      dragging = false;
+      if (pointer !== null) { try { vp.releasePointerCapture(pointer); } catch (err) {} pointer = null; }
+      var threshold = step() * 0.18;
+      if (dx <= -threshold) idx = Math.min(total - 1, idx + 1);
+      else if (dx >= threshold) idx = Math.max(0, idx - 1);
+      dx = 0;
+      track.style.transition = '';
+      void track.offsetWidth;
+      render(0);
+      sync();
+      start();
+    }
+    vp.addEventListener('pointerup', release);
+    vp.addEventListener('pointercancel', release);
+    vp.addEventListener('pointerleave', function () { if (dragging) release(); });
+
+    car.addEventListener('pointerenter', stop);
+    car.addEventListener('pointerleave', start);
+    car.addEventListener('focusin', stop);
+    car.addEventListener('focusout', function (e) { if (!car.contains(e.relatedTarget)) start(); });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop(); else start();
+    });
+
+    sync();
+    render(0);
+    start();
+    window.addEventListener('resize', function () { track.style.transition = 'none'; render(0); void track.offsetWidth; track.style.transition = ''; }, { passive: true });
+  }
+
+  /* ---------- 06 FAQ accordion (one open at a time) ---------- */
+  var qas = Array.prototype.slice.call(document.querySelectorAll('[data-qa]'));
+  qas.forEach(function (qa) {
+    var btn = qa.querySelector('.qa__q');
+    btn.addEventListener('click', function () {
+      var wasOpen = qa.getAttribute('data-open') === 'true';
+      qas.forEach(function (o) {
+        o.setAttribute('data-open', 'false');
+        o.querySelector('.qa__q').setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) {
+        qa.setAttribute('data-open', 'true');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  /* ---------- 07 subscribe form: validate, load, toast ---------- */
+  var form = document.getElementById('subForm');
+  var input = document.getElementById('email');
+  var msg = document.getElementById('subMsg');
+  var toast = document.getElementById('toast');
+  var toastText = document.getElementById('toastText');
+  var subBtn = document.getElementById('subBtn');
+  var idle = msg.textContent;
+  var mail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  var hideToast;
+
+  function say(text, bad) { msg.textContent = text; msg.classList.toggle('err', !!bad); }
+  function esc(s) { return s.replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fire(html) {
+    toastText.innerHTML = html;
+    toast.classList.add('show');
+    window.clearTimeout(hideToast);
+    hideToast = window.setTimeout(function () { toast.classList.remove('show'); }, 5600);
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (form.classList.contains('loading')) return;
+    var v = (input.value || '').trim();
+    if (!mail.test(v)) {
+      say('That address looks incomplete. Try name@company.com', true);
+      input.focus();
+      return;
+    }
+    say('Sending your confirmation', false);
+    form.classList.add('loading');
+    subBtn.disabled = true;
+    window.setTimeout(function () {
+      form.classList.remove('loading');
+      subBtn.disabled = false;
+      input.value = '';
+      say(idle, false);
+      fire('You are on the list. Confirmation sent to <b>' + esc(v) + '</b>.');
+    }, 1300);
+  });
+
+  /* ---------- 08 mobile menu ---------- */
+  var navToggle = document.getElementById('navToggle');
+  var navPanel = document.getElementById('navPanel');
+  function closeMenu() { navPanel.classList.remove('open'); navToggle.setAttribute('aria-expanded', 'false'); }
+  navToggle.addEventListener('click', function () {
+    var open = navPanel.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  navPanel.addEventListener('click', function (e) { if (e.target.tagName === 'A') closeMenu(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+
+  /* ---------- 09 boot ---------- */
+  if (reduce.addEventListener) {
+    reduce.addEventListener('change', function () {
+      if (reduce.matches) {
+        if (carApi) { carApi.stop(); carApi.go(0, false); }
+        if (mock) mock.style.transform = '';
+        paint();
+      } else if (carApi) {
+        carApi.start();
+      }
+    });
+  }
+
+  paint();
+})();
+</script>
+</body>
+</html>

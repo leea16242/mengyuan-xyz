@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#05060f;font:12px/1.4 monospace;color:#8ff}
+  #wrap{width:390px;height:844px;overflow:hidden;position:relative}
+  iframe{width:390px;height:844px;border:0;display:block}
+</style>
+</head>
+<body>
+<div id="wrap"><iframe id="f" src="probe_dark.html"></iframe></div>
+<script>
+(function () {
+  var f = document.getElementById('f');
+  f.addEventListener('load', function () {
+    var d = f.contentDocument;
+    if (!d) { document.body.setAttribute('data-report', 'no-content-document (need --allow-file-access-from-files)'); return; }
+    var vw = d.documentElement.clientWidth;
+    var rep = ['viewport=' + vw, 'docScrollW=' + d.documentElement.scrollWidth];
+    ['.nav__bar', '.hero__inner', 'h1', '.lead', '.hero__cta', '.stage', '.mock', '.mock__win',
+     '.grid3', '.feat', '.qcard', '.sub__row', '.foot__top'].forEach(function (s) {
+      var e = d.querySelector(s);
+      if (e) { var r = e.getBoundingClientRect(); rep.push(s + ' x=' + Math.round(r.x) + ' right=' + Math.round(r.right) + ' w=' + Math.round(r.width)); }
+    });
+    var worst = null, worstLeft = null;
+    Array.prototype.forEach.call(d.querySelectorAll('body *'), function (e) {
+      var r = e.getBoundingClientRect();
+      if (r.width === 0) return;
+      if (!worst || r.right > worst.right) worst = { n: e.className || e.tagName, right: r.right };
+      if (!worstLeft || r.left < worstLeft.left) worstLeft = { n: e.className || e.tagName, left: r.left };
+    });
+    rep.push('maxRight=' + Math.round(worst.right) + ' (' + String(worst.n).slice(0, 40) + ')');
+    rep.push('minLeft=' + Math.round(worstLeft.left) + ' (' + String(worstLeft.n).slice(0, 40) + ')');
+    document.body.setAttribute('data-report', rep.join(' || '));
+  });
+})();
+</script>
+</body>
+</html>

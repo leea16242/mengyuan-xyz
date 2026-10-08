@@ -1,0 +1,24 @@
+# 构建产物：由 python build.py 生成，Cloudflare Pages 会在云端跑同一命令
+dist/
+
+# 验证临时件：只保留脚本，其余（Chrome profile、截图、探针副本）不入库
+_probe/*
+!_probe/make_probe.py
+!_probe/make_test.py
+!_probe/make_test_detail.py
+!_probe/make_diag.py
+!_probe/make_pal.py
+!_probe/mobile_frame.html
+
+# 旧版留档里的 6 MB AI 人像原图（v1 产物已自包含，原图不必入库）
+v1_aetherflow/assets/
+
+# 手动上传用的 zip（可由 dist/ 重新打包）
+deploy/mengyuan-site.zip
+
+# 工具与系统文件
+.wrangler/
+__pycache__/
+*.pyc
+Thumbs.db
+desktop.ini
