@@ -33,8 +33,8 @@ python build_thumbs.py
 python build.py
 
 # 2. 部署（wrangler 已装在受管工作区并完成 OAuth 授权，凭据在本机）
-export PATH="/c/Users/li352/.workbuddy/binaries/node/versions/22.22.2-6:$PATH"
-"C:/Users/li352/.workbuddy/binaries/node/workspace/node_modules/.bin/wrangler" \
+export PATH="$HOME/.workbuddy/binaries/node/versions/22.22.2-6:$PATH"
+"$HOME/.workbuddy/binaries/node/workspace/node_modules/.bin/wrangler" \
   pages deploy dist --project-name mengyuan-xyz --branch main
 ```
 

@@ -153,8 +153,8 @@ nslookup -type=CAA mengyuan.xyz 1.1.1.1
 ```bash
 python build_thumbs.py          # 只有 CAD / EPLAN 原始渲染换了才需要跑
 python build.py                 # 输出到 dist/，逐页校验占位符与 em dash
-export PATH="/c/Users/li352/.workbuddy/binaries/node/versions/22.22.2-6:$PATH"
-"C:/Users/li352/.workbuddy/binaries/node/workspace/node_modules/.bin/wrangler" \
+export PATH="$HOME/.workbuddy/binaries/node/versions/22.22.2-6:$PATH"
+"$HOME/.workbuddy/binaries/node/workspace/node_modules/.bin/wrangler" \
   pages deploy dist --project-name mengyuan-xyz --branch main
 ```
 
