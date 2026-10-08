@@ -210,13 +210,37 @@ export PATH="/c/Users/li352/.workbuddy/binaries/node/versions/22.22.2-6:$PATH"
 
 **回滚**：第 3 步之前旧项目一直可用；万一新项目出问题，把域名按第 3、4 步反向搬回去即可。
 
-### 10.3 需要你在浏览器点的两处
+### 10.3 需要你做的（浏览器 + 一条命令）
 
-Git 集成有两处必须由你完成（我拿不到对应授权）：
+**① 建仓库**：`github.com/new` → 填仓库名 → **不要**勾选初始化 README / .gitignore / license
+（会与本地已有提交冲突）→ Create
+实际仓库名是 **`mengyuan-xyz`**（不是 `mengyuan.xyz`，后者不存在）。
 
-- **建仓库**：`github.com/new` → 填仓库名 → **不要**勾选初始化 README / .gitignore / license
-  （会与本地已有提交冲突）→ Create
-- **装 Cloudflare 的 GitHub App**：Cloudflare → Workers & Pages → Create → Pages →
-  **Connect to Git** → 授权 GitHub → 选仓库
+**② 装 Cloudflare 的 GitHub App**：Cloudflare → Workers & Pages → Create → Pages →
+**Connect to Git** → 授权 GitHub → 选仓库。（已完成）
 
-建好仓库告我仓库名，推送与后续配置我来做。
+**③ 推送代码**（必须你在自己的终端跑，原因见下）：
+
+```bash
+cd /d/AIchat/AIdailychat/WorkBuddy-work/glass-landing
+git push -u origin main
+```
+
+首次推送会弹出 GitHub 授权页，点授权即可。远程、分支、凭据助手都已配好，**只差这一条命令**。
+
+> ⚠️ **为什么 AI 这边推不了**：本机沙箱给命令行注入了出口代理（`http(s)_proxy=127.0.0.1:50109`），
+> 该代理**放行了 `api.github.com` 但没放行 `github.com`**，而 git 推送走的正是后者。
+> 实测两种 TLS 后端都失败：
+> schannel → `server closed abruptly (missing close_notify)`；
+> openssl → `CONNECT tunnel failed, response 502`；
+> 绕过代理直连 → `Connection was reset`。
+> 所以这一步只能由你在没有该代理的终端里执行。
+
+### 10.4 推完之后的顺序
+
+1. GitHub 上确认 `main` 分支有 2 个提交（`feat:` 与 `docs:`）
+2. Cloudflare → Workers & Pages → Create → Pages → **Connect to Git** → 选 `mengyuan-xyz`
+3. 构建配置按 10.1 填（命令 `python build.py`，输出目录 `dist`）→ Save and Deploy
+4. 等首次构建完成，先只验证它的 `*.pages.dev` 地址与 6 个详情页
+5. 全部正常后再按 10.2 搬自定义域
+
