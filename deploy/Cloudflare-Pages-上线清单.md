@@ -221,12 +221,27 @@ export PATH="$HOME/.workbuddy/binaries/node/versions/22.22.2-6:$PATH"
 
 **③ 推送代码**（必须你在自己的终端跑，原因见下）：
 
-```bash
-cd /d/AIchat/AIdailychat/WorkBuddy-work/glass-landing
+```bat
+:: cmd.exe 或 PowerShell —— 注意反斜杠与盘符
+cd /d D:\AIchat\AIdailychat\WorkBuddy-work\glass-landing
 git push -u origin main
 ```
 
+```bash
+# Git Bash —— 路径用正斜杠，/d 是 D 盘的挂载点
+cd /d/AIchat/AIdailychat/WorkBuddy-work/glass-landing && git push -u origin main
+```
+
+> ⚠️ **别把两种语法混用**：`cd /d/AIchat/...` 在 Git Bash 下正确，在 cmd 下会报「命令语法不正确」
+> （cmd 把 `/d` 当切换盘符的开关）。反过来 `cd /d D:\...` 在 Git Bash 下也错。
+> 判断你在哪个 shell：cmd 提示符是 `C:\Users\...>`，Git Bash 是 `user@host MINGW64 ~$`。
+
 首次推送会弹出 GitHub 授权页，点授权即可。远程、分支、凭据助手都已配好，**只差这一条命令**。
+
+> 凭据助手已改成**绝对路径**：
+> `credential.helper = C:/Users/<user>/AppData/Local/hermes/git/mingw64/bin/git-credential-manager.exe`
+> （写在 `.git/config`，不入库）。原因：本机 `git` 用的 hermes 发行版把 GCM 放在 `mingw64/bin`，
+> 而该目录**不在持久化 PATH 里**，按名字写 `manager` 会找不到。改绝对路径后与 PATH 无关。
 
 > ⚠️ **为什么 AI 这边推不了**：本机沙箱给命令行注入了出口代理（`http(s)_proxy=127.0.0.1:50109`），
 > 该代理**放行了 `api.github.com` 但没放行 `github.com`**，而 git 推送走的正是后者。
