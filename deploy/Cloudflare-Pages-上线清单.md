@@ -169,3 +169,54 @@ export PATH="/c/Users/li352/.workbuddy/binaries/node/versions/22.22.2-6:$PATH"
 > 必须**新建一个 Git 集成项目**，再把 `mengyuan.xyz` 从旧项目移除、在新项目里重新 Set up a domain。
 
 
+
+
+---
+
+## 10. Git 集成项目（可选，替代 Direct Upload）
+
+**当前线上跑的是 Direct Upload 项目**（拖 zip / wrangler 上传）。若想「push 即自动部署」，
+得**新建一个 Git 集成的项目**，因为 Direct Upload 项目**不能中途切换**成 Git 集成。
+
+### 10.1 云端构建配置（已本地验证成立）
+
+`build.py` 只用 Python 标准库；Cloudflare Pages 的 v3 构建镜像**自带 Python 3.13.3**。
+所以仓库里**不需要提交 `dist/`**，让云端现建即可。
+
+| 设置项 | 值 |
+|---|---|
+| 生产分支 | `main` |
+| 构建命令 | `python build.py` |
+| 构建输出目录 | `dist` |
+| 根目录 | 留空（默认仓库根） |
+| 环境变量 | 不需要（要锁版本可加 `PYTHON_VERSION=3.13.3`） |
+
+> 已实测：`git archive HEAD` 导出干净检出 → `python build.py` → 产出的 7 个页面与本地 `dist/`
+> **逐字节一致**（文件集合相同、无一处内容不一致）。
+>
+> 注意 `build_thumbs.py` **不能**在云端跑（依赖 Pillow 与 numpy）。它只在你本地换了
+> CAD / EPLAN 原始渲染时才需要重跑，生成的 WebP 已提交进仓库。
+
+### 10.2 迁移自定义域的安全顺序（重要）
+
+同一个域名**只能挂在一个 Pages 项目上**，所以搬域名必然有一次切换，切的时候证书要重签（几分钟）。
+按这个顺序做，apex 不会中断：
+
+1. 新项目建好后，先在它上面加**子域** `new.mengyuan.xyz`，等状态 Active
+2. 逐个打开 `https://new.mengyuan.xyz/` 与 6 个详情页，确认全部 200 且显示正常
+3. 确认无误后，到**旧项目** → Custom domains → 移除 `mengyuan.xyz` 与 `www.mengyuan.xyz`
+4. 到**新项目** → Custom domains → Set up a domain → 加 `mengyuan.xyz` 与 `www.mengyuan.xyz`
+5. 等 Active（通常几分钟），再按第 5 节做一遍上线验收
+
+**回滚**：第 3 步之前旧项目一直可用；万一新项目出问题，把域名按第 3、4 步反向搬回去即可。
+
+### 10.3 需要你在浏览器点的两处
+
+Git 集成有两处必须由你完成（我拿不到对应授权）：
+
+- **建仓库**：`github.com/new` → 填仓库名 → **不要**勾选初始化 README / .gitignore / license
+  （会与本地已有提交冲突）→ Create
+- **装 Cloudflare 的 GitHub App**：Cloudflare → Workers & Pages → Create → Pages →
+  **Connect to Git** → 授权 GitHub → 选仓库
+
+建好仓库告我仓库名，推送与后续配置我来做。

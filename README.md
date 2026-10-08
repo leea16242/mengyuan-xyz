@@ -58,7 +58,27 @@ export PATH="/c/Users/li352/.workbuddy/binaries/node/versions/22.22.2-6:$PATH"
 
 详细逐步操作见 `deploy/Cloudflare-Pages-上线清单.md`。
 
-## 三、内容结构（v2）
+### Git 与云端构建
+
+本站已纳入 git 版本管理（`main` 分支），入库 **54 个文件 / 0.59 MB**。
+`.gitignore` 排除：`dist/`（构建产物）、`_probe/` 下的临时件与截图（脚本保留）、
+`v1_aetherflow/assets/`（6 MB 人像原图）、`deploy/*.zip`。
+
+**云端构建配置**（Pages v3 镜像自带 Python 3.13.3）：
+
+| 设置项 | 值 |
+|---|---|
+| 生产分支 | `main` |
+| 构建命令 | `python build.py` |
+| 构建输出目录 | `dist` |
+
+- `build.py` 只用标准库，可在云端跑；`build_thumbs.py` **不行**（依赖 Pillow 与 numpy），
+  它只在你本地换了 CAD / EPLAN 原始渲染时重跑，产出的 WebP 已入库。
+- 已实测：`git archive HEAD` 导出干净检出 → `python build.py` → 与本地 `dist/` **逐字节一致**（7/7 页）。
+- 迁移自定义域的安全顺序（先挂子域验证、再搬 apex、可回滚）见
+  `deploy/Cloudflare-Pages-上线清单.md` 第 10 节。
+
+
 
 | 区块 | id | 内容 |
 |---|---|---|
