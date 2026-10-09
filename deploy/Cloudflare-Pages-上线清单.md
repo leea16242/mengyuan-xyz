@@ -236,12 +236,26 @@ cd /d/AIchat/AIdailychat/WorkBuddy-work/glass-landing && git push -u origin main
 > （cmd 把 `/d` 当切换盘符的开关）。反过来 `cd /d D:\...` 在 Git Bash 下也错。
 > 判断你在哪个 shell：cmd 提示符是 `C:\Users\...>`，Git Bash 是 `user@host MINGW64 ~$`。
 
-首次推送会弹出 GitHub 授权页，点授权即可。远程、分支、凭据助手都已配好，**只差这一条命令**。
+首次推送走 **Git Credential Manager 的设备码流程**（不用 token、不用粘贴）：
 
-> 凭据助手已改成**绝对路径**：
-> `credential.helper = C:/Users/<user>/AppData/Local/hermes/git/mingw64/bin/git-credential-manager.exe`
-> （写在 `.git/config`，不入库）。原因：本机 `git` 用的 hermes 发行版把 GCM 放在 `mingw64/bin`，
-> 而该目录**不在持久化 PATH 里**，按名字写 `manager` 会找不到。改绝对路径后与 PATH 无关。
+1. 终端会先打印一行提示和一个 **8 位码**（形如 `ABCD-1234`）
+2. 浏览器打开下面这个网址（单独一行，直接整行复制）：
+
+```
+https://github.com/login/device
+```
+
+3. 输入那 8 位码 → **Authorize**
+4. 回到终端，推送自动继续，出现 `* [new branch] main -> main` 即成功
+
+凭据会存进 **Windows 凭据管理器**，以后推送静默完成，不用再授权。
+
+> **凭据是怎么配的**：仓库级 `credential.helper` 先置空（清掉系统继承的 `helper-selector`），
+> 再指向本机 GCM 的绝对路径；并设 `credential.gitHubAuthModes = device` 强制走设备码。
+> 三者都写在 `.git/config`，**不入库**。与 PATH 无关，cmd 与 Git Bash 行为一致。
+>
+> 想改成浏览器 OAuth：把 `device` 换成 `browser`；想立刻重新登录：
+> `git-credential-manager github login --device --force`
 
 > ⚠️ **为什么 AI 这边推不了**：本机沙箱给命令行注入了出口代理（`http(s)_proxy=127.0.0.1:50109`），
 > 该代理**放行了 `api.github.com` 但没放行 `github.com`**，而 git 推送走的正是后者。
@@ -259,3 +273,26 @@ cd /d/AIchat/AIdailychat/WorkBuddy-work/glass-landing && git push -u origin main
 4. 等首次构建完成，先只验证它的 `*.pages.dev` 地址与 6 个详情页
 5. 全部正常后再按 10.2 搬自定义域
 
+
+
+---
+
+## 11. Git 集成项目现状（2026-10-09）
+
+| 项 | 值 |
+|---|---|
+| Pages 项目名 | `mengyuan-xyz-git` |
+| 源仓库 | `leea16242/mengyuan-xyz`（GitHub，生产分支 `main`） |
+| 构建命令 | `python build.py` |
+| 输出目录 | `dist` |
+| 预览地址 | `https://mengyuan-xyz-git.pages.dev` |
+| 正式域名 | 仍在**旧项目** `mengyuan-xyz`（Direct Upload）上，未迁移 |
+
+### 触发构建
+往 `main` 推任何提交即自动构建部署，不需要本地跑 wrangler。
+
+### 注意
+- 面板里另有一个**同名 Worker** `mengyuan-xyz-git`（Workers 产品，不是 Pages）。
+  它没被使用，容易和 Pages 项目混淆，可以删掉：Workers & Pages → 该 Worker → Settings → Delete。
+- 本项目是用 Cloudflare API 建的，不是面板的 Connect to Git 流程。
+  两者产物相同，但**只有面板流程会自动跑一次首次构建**；API 建的需要一次 push 才触发。
