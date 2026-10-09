@@ -25,26 +25,33 @@
 
 ## 二、重建与上线
 
+**当前走 Git 集成**：站点由 Pages 项目 `mengyuan-xyz-git` 托管，
+源仓库 `leea16242/mengyuan-xyz`，云端构建命令 `python build.py`、输出目录 `dist`。
+
 ```bash
-# 0. 只有 CAD / EPLAN 原始渲染换了才需要重跑
-python build_thumbs.py
-
-# 1. 改 src/ 或 cases.py 后重建（输出到 dist/，并逐页校验）
-python build.py
-
-# 2. 部署（wrangler 已装在受管工作区并完成 OAuth 授权，凭据在本机）
-export PATH="$HOME/.workbuddy/binaries/node/versions/22.22.2-6:$PATH"
-"$HOME/.workbuddy/binaries/node/workspace/node_modules/.bin/wrangler" \
-  pages deploy dist --project-name mengyuan-xyz --branch main
+# 平时只需提交并推送，Cloudflare 会自动 clone + 构建 + 部署
+git add -A && git commit -m "..." && git push
 ```
 
-**手动方式**：把 `deploy/mengyuan-site.zip` 拖进 Pages 的 Create a new deployment。
-压缩包里必须是 `index.html` + `case/…/index.html` 的目录树，不能多套一层文件夹。
+**不需要推送也能部署**（github.com 被墙时的备用通道）——
+让 Cloudflare 自己去克隆仓库跑一遍构建：
 
-上传完成会打印一个 `https://<hash>.mengyuan-xyz.pages.dev` 预览地址，同时自动成为生产版本。
+```bash
+POST /accounts/{account_id}/pages/projects/mengyuan-xyz-git/deployments
+GET  /accounts/{account_id}/pages/projects/mengyuan-xyz-git/deployments   # 看各阶段状态
+```
 
-**若改用浏览器拖拽**：把 `deploy/site/index.html` 压成 zip（`index.html` 必须在压缩包根目录）
-→ Pages 项目 → **Create a new deployment** → 拖入 → Deploy。域名与 DNS 全程不用动。
+本机有小工具 `_probe/cf_pages.py` 调这套 API（`deploys` / `domains` / `create` 等）。
+它用 wrangler 的 OAuth 凭据；**token 若报 9109，先跑一次 `wrangler whoami` 刷新**。
+
+```bash
+# 只有换了 CAD / EPLAN 原始渲染时才需要本地重跑图片
+python build_thumbs.py
+python build.py      # 本地预览用；云端构建等同于这一步
+```
+
+> **旧的 wrangler 直传方式已退役**：旧项目 `mengyuan-xyz`（Direct Upload）已不再绑定域名，
+> 仅作为回滚点保留。`deploy/mengyuan-site.zip` 是手动上传用的压缩包（备用）。
 
 > 环境备注（2026-10-07 实测）：官方 npm 源走代理会 `ECONNRESET`，只能用 npmmirror；
 > 而 npmmirror 不装可选平台二进制，需显式补两条：
