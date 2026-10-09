@@ -296,3 +296,34 @@ https://github.com/login/device
   它没被使用，容易和 Pages 项目混淆，可以删掉：Workers & Pages → 该 Worker → Settings → Delete。
 - 本项目是用 Cloudflare API 建的，不是面板的 Connect to Git 流程。
   两者产物相同，但**只有面板流程会自动跑一次首次构建**；API 建的需要一次 push 才触发。
+
+
+---
+
+## 12. 结论与收尾（2026-10-09）
+
+### 已确认可用
+- **Git 集成 Pages 项目**：`mengyuan-xyz-git`，源 `leea16242/mengyuan-xyz`
+- **云端构建成功**：`queued → initialize → clone_repo → build → deploy` 五阶段全绿，**耗时 11 秒**
+- **7 个页面全部 200**（在部署地址与生产别名上各验一遍）：
+  `/` 与 `/case/{pump,crown,gear,funnel,bracket,eplan}/`
+
+### ★ 用 API 触发构建（不需要 push）
+```bash
+POST /accounts/{account_id}/pages/projects/{project}/deployments
+```
+对 **Git 项目**也有效：会去克隆仓库并跑构建。返回 `{id, url}`，
+再用 `GET .../deployments` 看 `stages` 各阶段状态。
+（面板的 Save and Deploy 只是替你做这件事；API 建的项目不会自动跑首次构建。）
+
+### 域名迁移必须在面板做
+本机 wrangler 的 OAuth token 权限里有 `pages:write`，但**没有 `dns_records:edit`**，
+所以用 API 加自定义域时 **DNS 记录建不出来**（`new.mengyuan.xyz` 一直是
+`status=pending / verification=pending`）。面板里有 DNS 权限，会一并建好记录并签证书。
+
+### 迁移步骤（面板，可回滚）
+1. 新项目 `mengyuan-xyz-git` → **Domains** 标签 → Add domain → `mengyuan.xyz`
+   （此时会提示已被旧项目占用）
+2. 旧项目 `mengyuan-xyz` → Domains → 删除 `mengyuan.xyz` 与 `www.mengyuan.xyz`
+3. 回到新项目重新加这两个域名 → 等 Active（证书重签几分钟）
+4. **回滚**：把两个域名按同样方式搬回旧项目即可（旧项目的部署记录都还在）
