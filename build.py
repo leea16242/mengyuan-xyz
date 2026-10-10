@@ -79,6 +79,7 @@ def build_detail(c, prev, nxt):
         "{{PAGE_TITLE}}": t("%s · %s · MENGYUAN" % (c["title"], c["tags"][0])),
         "{{PAGE_DESC}}": a(c["summary"]),
         "{{NUM}}": c["num"],
+        "{{TOTAL}}": "%02d" % len(cases.CASES),
         "{{TITLE}}": t(c["title"]),
         "{{SUMMARY}}": t(c["summary"]),
         "{{TAGS}}": "".join("<span>%s</span>" % t(x) for x in c["tags"]),

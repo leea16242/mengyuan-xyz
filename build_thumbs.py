@@ -54,6 +54,11 @@ CASES = {
         ("WorkBuddy-work/eplan_work/export/正反转_控制电路.png", None),
         ("WorkBuddy-work/eplan_work/export/正反转_主电路.png", None),
     ],
+    "pulley": [
+        ("cad-sample/parts/pulley/pulley_iso.png", None),
+        ("cad-sample/parts/pulley/pulley_front.png", None),
+        ("cad-sample/parts/pulley/pulley_top.png", None),
+    ],
 }
 
 
@@ -107,7 +112,11 @@ def main():
             if isinstance(mode, tuple):
                 w, h = img.size
                 img = img.crop((int(w * mode[0]), int(h * mode[1]), int(w * mode[2]), int(h * mode[3])))
-            for size, name in ((CARD, "%s.webp" % key), (SHOT, "%s-%d.webp" % (key, i + 1))):
+            # 卡片缩略图只取第 1 张（= 详情页 hero），否则会被后面几张反复覆写
+            jobs = [(SHOT, "%s-%d.webp" % (key, i + 1))]
+            if i == 0:
+                jobs.insert(0, (CARD, "%s.webp" % key))
+            for size, name in jobs:
                 dst = os.path.join(OUT, name)
                 out = center_crop(img, size[0] / float(size[1])) if mode == "center" else frame(img, size)
                 out.resize(size, Image.LANCZOS).save(dst, "WEBP", quality=78, method=6)

@@ -6,13 +6,15 @@ Also pins the detail layout open for screenshots (headless Chrome does not
 advance CSS transitions under --virtual-time-budget).
 """
 import os
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+SLUG = sys.argv[1] if len(sys.argv) > 1 else "pump"
 
 
 def make(name, theme, freeze):
-    with open(os.path.join(ROOT, "dist", "case", "pump", "index.html"), "r", encoding="utf-8") as fh:
+    with open(os.path.join(ROOT, "dist", "case", SLUG, "index.html"), "r", encoding="utf-8") as fh:
         html = fh.read()
     if theme == "light":
         html = html.replace('<html lang="zh-CN" data-theme="dark">', '<html lang="zh-CN" data-theme="light">', 1)
@@ -54,7 +56,7 @@ window.addEventListener('load', function () {
 
 
 def main():
-    src = os.path.join(ROOT, "dist", "case", "pump", "index.html")
+    src = os.path.join(ROOT, "dist", "case", SLUG, "index.html")
     with open(src, "r", encoding="utf-8") as fh:
         html = fh.read()
     out = os.path.join(HERE, "probe_detail_test.html")
