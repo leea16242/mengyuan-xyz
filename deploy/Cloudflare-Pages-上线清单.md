@@ -327,3 +327,37 @@ POST /accounts/{account_id}/pages/projects/{project}/deployments
 2. 旧项目 `mengyuan-xyz` → Domains → 删除 `mengyuan.xyz` 与 `www.mengyuan.xyz`
 3. 回到新项目重新加这两个域名 → 等 Active（证书重签几分钟）
 4. **回滚**：把两个域名按同样方式搬回旧项目即可（旧项目的部署记录都还在）
+
+---
+
+## 13. 两条 API 兜底通道（github.com 不通时用）
+
+本机 github.com 时通时断（git push 会报 Recv failure: Connection was reset），
+但 api.github.com 与 api.cloudflare.com 一直可达，所以有两条兜底：
+
+### 13.1 推代码：GitHub Git Data API
+
+用 `_probe/push_via_api.py`：
+
+- token 自己从 `git credential fill` 取（Windows 凭据管理器里 GCM 存的 OAuth token），不用手输
+- 只推远端缺的提交（先读 `GET /git/refs/heads/main`）
+- 流程 `blob -> tree -> commit -> 更新 ref`，每步断言 SHA
+
+> ⚠️ 已知限制：API 算出的 **tree SHA 与本地 git 不一致**（用同一份文件列表重建也复现不出），
+> 因此推上去的**提交 SHA 与本地不同**。逐文件核对过内容一致（文件集合 + blob SHA 全同）。
+> 后果：本地 main 与远端分叉，用户下次手动 `git push` 会被拒，
+> 需先 `git fetch && git reset --hard origin/main` 对齐一次。
+> **所以 API 推送只当兜底，不要当常规手段。**
+
+### 13.2 部署：Cloudflare API 触发构建
+
+```bash
+POST /accounts/{account_id}/pages/projects/mengyuan-xyz-git/deployments
+```
+
+对 Git 项目同样有效（会 clone 仓库并构建），返回 `{id, url}`；
+用 `GET .../deployments` 看 `stages` 各阶段状态。无需 push、无需 wrangler 凭据有效。
+
+> 顺带验证到：**push 触发自动构建的 webhook 是通的**（API 推送后 Cloudflare 自动起了一次构建）。
+> 正常路径仍是「commit + push」，13.1 与 13.2 只在网络不通时使用。
+
