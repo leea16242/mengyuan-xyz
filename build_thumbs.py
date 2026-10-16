@@ -59,6 +59,21 @@ CASES = {
         ("cad-sample/parts/pulley/pulley_front.png", None),
         ("cad-sample/parts/pulley/pulley_top.png", None),
     ],
+    "caster": [
+        ("cad-sample/parts/caster/asm_iso.png", None),
+        ("cad-sample/parts/caster/asm_front.png", None),
+        ("cad-sample/parts/caster/base_iso.png", None),
+    ],
+    "football": [
+        ("cad-sample/parts/football/football_iso.png", None),
+        ("cad-sample/parts/football/football_front.png", None),
+        ("cad-sample/parts/football/football_top.png", None),
+    ],
+    "straw": [
+        ("cad-sample/parts/straw/straw_iso.png", None),
+        ("cad-sample/parts/straw/straw_front.png", None),
+        ("cad-sample/parts/straw/straw_right.png", None),
+    ],
 }
 
 
