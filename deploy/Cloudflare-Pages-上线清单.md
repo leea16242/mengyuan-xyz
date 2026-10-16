@@ -361,3 +361,40 @@ POST /accounts/{account_id}/pages/projects/mengyuan-xyz-git/deployments
 > 顺带验证到：**push 触发自动构建的 webhook 是通的**（API 推送后 Cloudflare 自动起了一次构建）。
 > 正常路径仍是「commit + push」，13.1 与 13.2 只在网络不通时使用。
 
+---
+
+## 14. ★ Git Data API 的路径转义坑（2026-10-16 定位并修复）
+
+### 症状
+用 API 推上去的提交，**tree SHA 与本地 git 算出的总是不一致**（内容核对却全对），
+导致提交 SHA 与本地不同、本地与远端分叉。
+
+### 根因
+`git ls-tree` 在 `core.quotePath=true`（默认）下，会**给含非 ASCII 的路径加引号并八进制转义**：
+```
+100644 blob <sha>	"deploy/Cloudflare-Pages-\344\270\212\347\272\277\346\270\205\345\225\206.md"
+```
+脚本按原样取用这个字符串当路径 → 远端多出一个名叫 `"deploy` 的目录，
+文件名也带着 `\344\270\212...` 这样的八进制串 ✗。树自然对不上。
+
+### 修复
+改用 **零分隔输出**，路径原样返回：
+```python
+git("ls-tree", "-r", "-z", ref).decode().split("\0")   # 注意跳过末尾空条目
+```
+（`_probe/push_via_api.py` 与 `_probe/push_incremental.py` 都已改）
+
+### 修复后的验证（2026-10-16）
+全量重推 11 个提交，**每个都打印「SHA 完全一致」**，最终
+`远端 main = 本地 HEAD = 94739e0e`，远端顶层条目与本地完全相同（70 文件）。
+**分叉彻底消除**，之后用户的 `git push` 是普通快进。
+
+### 教训（写给自己）
+1. **别信「内容对得上就万事大吉」**：blob SHA 一致但路径被转义，树照样是错的。
+   要验就验到 **tree/commit 的 SHA 相等**，那才是逐字节相同。
+2. **用 `-z` 解析 git 的机器可读输出**，别用会被引号转义的 `ls-tree`/`ls-files` 默认输出。
+3. **`git reset --hard origin/main` 只在 fetch 确认成功后才安全**：
+   2026-10-10 一次 fetch 失败（网络）后照旧 reset，用的是**过期的** origin/main，
+   把 4 个本地提交（含「皮带轮支座」案例）回退了。补救靠 `git reflog` 找回提交 SHA 再 `git reset --hard <sha>`。
+
+
